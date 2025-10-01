@@ -1,0 +1,7 @@
+path: /content/drive/MyDrive/QR_Dataset  # root of dataset
+train: train/images
+val: val/images
+
+# only one class → QR code
+names:
+  0: qr
