@@ -1,16 +1,12 @@
 from ultralytics import YOLO
 
-# Initialize YOLOv8 model (lightweight)
-model = YOLO("yolov8n.pt")  
-
-# Train
+model = YOLO("yolov8n.pt")  # lightweight pretrained model
 model.train(
-    data="data/data.yaml",   # YAML path
+    data="data.yaml",
     epochs=50,
     imgsz=640,
     batch=16,
-    augment=True
+    augment=True,
+    project="outputs",
+    name="qr_detection",
 )
-
-# Save trained weights
-model.save("outputs/yolov8_qr.pt")
