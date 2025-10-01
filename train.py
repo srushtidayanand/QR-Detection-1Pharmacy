@@ -1,59 +1,53 @@
-import os
-import random
-import shutil
+# train.py
+
+
 from ultralytics import YOLO
+import argparse
+import os
 
-# -----------------------
-# 0️⃣ Set directories
-# -----------------------
-WORK_DIR = "/content/drive/MyDrive/QR-Detection-1Pharmacy"
-DATA_DIR = os.path.join(WORK_DIR, "data")
-TRAIN_DIR = os.path.join(DATA_DIR, "train_images")
-VAL_DIR = os.path.join(DATA_DIR, "val_images")
 
-os.makedirs(VAL_DIR, exist_ok=True)
+# Training script for YOLOv8 model (yolov8m) with augmentation good for small/tilted/blurred QRs
 
-# -----------------------
-# 1️⃣ Split 10% of training for validation
-# -----------------------
-all_images = [f for f in os.listdir(TRAIN_DIR) if f.endswith((".jpg", ".png", ".jpeg"))]
-random.shuffle(all_images)
-val_split = 0.1
-num_val = int(len(all_images) * val_split)
 
-for img in all_images[:num_val]:
-    shutil.move(os.path.join(TRAIN_DIR, img), os.path.join(VAL_DIR, img))
+def parse_args():
+p = argparse.ArgumentParser()
+p.add_argument('--data', type=str, default='dataset.yaml', help='path to dataset yaml')
+p.add_argument('--epochs', type=int, default=100)
+p.add_argument('--imgsz', type=int, default=960)
+p.add_argument('--batch', type=int, default=8)
+p.add_argument('--weights', type=str, default='yolov8m.pt', help='pretrained weights or path')
+p.add_argument('--project', type=str, default='runs/train')
+p.add_argument('--name', type=str, default='yolov8m_multiqr')
+return p.parse_args()
 
-print(f"Training images: {len(os.listdir(TRAIN_DIR))}")
-print(f"Validation images: {len(os.listdir(VAL_DIR))}")
 
-# -----------------------
-# 2️⃣ Create data.yaml
-# -----------------------
-data_yaml_path = os.path.join(WORK_DIR, "data.yaml")
-data_yaml = f"""
-train: {TRAIN_DIR}
-val: {VAL_DIR}
-nc: 1
-names: ['qr']
-"""
 
-with open(data_yaml_path, "w") as f:
-    f.write(data_yaml)
 
-# -----------------------
-# 3️⃣ Train YOLOv8
-# -----------------------
-model = YOLO("yolov8n.pt")  # pretrained YOLOv8n
+def main():
+args = parse_args()
 
+
+# Create project dir
+os.makedirs(args.project, exist_ok=True)
+
+
+# Load model
+model = YOLO(args.weights)
+
+
+# Train with augmentations (Ultralytics integrates mosaic, mixup, hsv by default when 'augment=True')
 model.train(
-    data=data_yaml_path,
-    epochs=50,
-    imgsz=640,
-    batch=16,
-    augment=True,
-    name="qr_detection",
-    save_dir=os.path.join(WORK_DIR, "runs/detect")
+data=args.data,
+epochs=args.epochs,
+imgsz=args.imgsz,
+batch=args.batch,
+project=args.project,
+name=args.name,
+exist_ok=True,
+augment=True, # basic augmentations
+# You can fine tune hyperparameters in 'hyperparameters' dict if needed
 )
 
-print("✅ Training completed. Weights saved in runs/detect/qr_detection/weights/")
+
+if __name__ == '__main__':
+main()
