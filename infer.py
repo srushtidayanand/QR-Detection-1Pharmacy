@@ -1,4 +1,27 @@
 # infer.py
+import argparse
+import os
+from ultralytics import YOLO
+import cv2
+from src.utils import xyxy_to_list, write_detection_submission, write_decoding_submission
+
+
+
+
+def parse_args():
+p = argparse.ArgumentParser()
+p.add_argument('--weights', type=str, default='runs/train/yolov8m_multiqr/weights/best.pt')
+p.add_argument('--input', type=str, required=True, help='folder with images to run inference on')
+p.add_argument('--output', type=str, default='outputs/submission_detection_1.json')
+p.add_argument('--conf', type=float, default=0.25)
+p.add_argument('--iou', type=float, default=0.45)
+p.add_argument('--decode', action='store_true', help='attempt QR decoding using OpenCV for bonus output')
+p.add_argument('--dec_output', type=str, default='outputs/submission_decoding_2.json')
+return p.parse_args()
+
+
+
+
 def run_detection(weights, input_folder, conf_thres=0.25, iou_thres=0.45):
 model = YOLO(weights)
 results = {}
@@ -50,29 +73,4 @@ if data.isalnum():
 qtype = 'alphanumeric'
 else:
 qtype = 'other'
-items.append({"bbox": bbox, "value": data if data else "", "type": qtype})
-decode_results[image_id] = items
-return decode_results
-
-
-
-
-def main():
-args = parse_args()
-os.makedirs(os.path.dirname(args.output), exist_ok=True)
-
-
-det_results = run_detection(args.weights, args.input, args.conf, args.iou)
-write_detection_submission(det_results, args.output)
-print(f"Wrote detection submission to {args.output}")
-
-
-if args.decode:
-os.makedirs(os.path.dirname(args.dec_output), exist_ok=True)
-dec_results = run_decoding(det_results, args.input)
-write_decoding_submission(dec_results, args.dec_output)
-print(f"Wrote decoding submission to {args.dec_output}")
-
-
-if __name__ == '__main__':
 main()
