@@ -1,0 +1,4 @@
+train: data/train_images
+val: data/test_images
+nc: 1
+names: ['qr']
