@@ -1,31 +1,26 @@
+from ultralytics import YOLO
+import cv2
 import os
 import json
-import cv2
-from ultralytics import YOLO
 
-# Load model
-model = YOLO("outputs/yolov8_qr.pt")  # trained weights
+model = YOLO("outputs/qr_detection/weights/best.pt")
 
-# Input folder & output JSON
-input_folder = "data/test_images"
+image_folder = "data/test_images"
 output_json = "outputs/submission_detection_1.json"
 
-results = []
+results_list = []
 
-for img_name in os.listdir(input_folder):
-    if img_name.lower().endswith((".jpg",".png",".jpeg")):
-        img_path = os.path.join(input_folder, img_name)
-        detections = model.predict(img_path, imgsz=640, conf=0.3, verbose=False)
-
+for img_name in os.listdir(image_folder):
+    if img_name.endswith((".jpg", ".png", ".jpeg")):
+        img_path = os.path.join(image_folder, img_name)
+        results = model.predict(img_path, save=False)
         qrs = []
-        for det in detections[0].boxes.xyxy:
-            x_min, y_min, x_max, y_max = det.cpu().numpy().astype(int)
+        for box in results[0].boxes.xyxy:
+            x_min, y_min, x_max, y_max = map(int, box)
             qrs.append({"bbox": [x_min, y_min, x_max, y_max]})
+        results_list.append({"image_id": img_name, "qrs": qrs})
 
-        results.append({"image_id": img_name, "qrs": qrs})
-
-# Save JSON
 with open(output_json, "w") as f:
-    json.dump(results, f, indent=4)
+    json.dump(results_list, f, indent=4)
 
-print(f"Detection JSON saved to {output_json}")
+print(f"Detection results saved to {output_json}")
