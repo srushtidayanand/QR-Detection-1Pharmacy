@@ -8,11 +8,10 @@ This project detects multiple QR codes on medicine packs, handling challenges li
 ## ⚙️ Setup
 
 
-## ⚙️ Setup Instructions
 
  
 ✅ Step 1 — Clone the Repository
-```bash
+
 git clone https://github.com/srushtidayanand/QR-Detection-1Pharmacy.git
 cd QR-Detection-1Pharmacy
 
