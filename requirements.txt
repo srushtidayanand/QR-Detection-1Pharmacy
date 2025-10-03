@@ -9,3 +9,4 @@ pyyaml
 tqdm
 !apt-get update -y
 !apt-get install -y libzbar0
+!pip install ultralytics opencv-python-headless pillow pyzbar tqdm numpy pandas
