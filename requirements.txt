@@ -7,3 +7,5 @@ Pillow
 matplotlib
 pyyaml
 tqdm
+!apt-get update -y
+!apt-get install -y libzbar0
