@@ -1,0 +1,23 @@
+# Ignore dataset zips and extracted datasets
+*.zip
+QR_Dataset/
+data/
+datasets/
+
+# Ignore large model files
+*.pt
+*.pth
+*.onnx
+*.tflite
+*.engine
+*.trt
+runs/
+
+# Ignore Colab/VSCode temp files
+*.ipynb_checkpoints/
+__pycache__/
+*.log
+.DS_Store
+
+# Ignore drive mounts
+/content/drive/
