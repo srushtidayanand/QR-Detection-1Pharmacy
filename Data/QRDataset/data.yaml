@@ -1,0 +1,7 @@
+path: /content/multiqr/data/QRDataset
+train: images/train
+val: images/val
+test: images/test
+hidden_hidden : images/hidden_images
+nc: 1
+names: ['qr']
